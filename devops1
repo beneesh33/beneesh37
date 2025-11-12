@@ -1,0 +1,224 @@
+# Step 1 – Initialize Git
+git init
+
+# Step 2 – Configure (first time only)
+git config --global user.name "Your Name"
+git config --global user.email "youremail@example.com"
+
+# Step 3 – Add file
+git add index.html
+
+# Step 4 – Commit
+git commit -m "Initial commit with index.html"
+
+# Step 5 – Link to GitHub
+git remote add origin https://github.com/yourusername/GitLabExam.git
+git branch -M main
+
+# Step 6 – Push to GitHub
+git push -u origin main
+
+# Step 7 – Edit file, then update
+git add .
+git commit -m "Updated index.html with success message"
+git push origin main
+
+# Step 8 – Create new branch
+git checkout -b feature1
+
+# Step 9 – Edit file, then push branch
+git add .
+git commit -m "Added feature1 branch content"
+git push origin feature1
+
+# Step 10 – Merge branch to main
+git checkout main
+git merge feature1
+git push origin main
+
+
+
+
+
+2
+
+
+
+
+# Step 1 – Create project folder
+mkdir docker-demo
+cd docker-demo
+
+# Step 2 – Create index.html
+<h1>Hello from Docker!</h1>
+
+# Step 3 – Create Dockerfile
+FROM nginx
+COPY index.html /usr/share/nginx/html/index.html
+
+# Step 4 – Build image
+docker build -t myweb:v1 .
+
+# Step 5 – Run container
+docker run -d -p 8080:80 myweb:v1
+
+# Step 6 – Check running containers
+docker ps
+
+# Step 7 – Test in browser
+http://localhost:8080
+
+
+
+
+
+3
+
+
+
+app.py
+
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Hello from Flask running in Docker!"
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
+
+
+requirements.txt
+
+Flask
+
+
+Dockerfile
+
+FROM python:3.9-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 5000
+CMD ["python", "app.py"]
+
+
+Commands
+
+docker build -t flask-docker-app .
+docker run -p 5000:5000 flask-docker-app
+
+
+Open in browser:
+
+http://localhost:5000
+
+
+Push to Docker Hub
+
+docker login
+docker tag flask-docker-app yourname/flask-docker-app:latest
+docker push yourname/flask-docker-app:latest
+
+
+Test Pull
+
+docker pull yourname/flask-docker-app:latest
+docker run -p 5000:5000 yourname/flask-docker-app:latest
+
+
+
+
+4
+
+
+
+
+docker-compose.yml
+
+version: '3.8'
+
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+
+volumes:
+  jenkins_home:
+
+
+Commands
+
+docker compose up -d
+docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+
+
+Open Jenkins:
+
+http://localhost:8080
+
+
+Setup Steps
+
+Install Suggested Plugins
+
+Create Admin User
+
+Install “HTML Publisher” Plugin
+
+Manage Jenkins → Plugins → Available → Search “HTML Publisher” → Install
+
+Create Freestyle Job
+
+Add Execute Shell:
+
+mkdir site
+echo "<h1>Welcome to Jenkins Static Site</h1>" > site/index.html
+
+
+Post-build Action → Publish HTML reports
+
+Directory: site
+
+Index page: index.html
+
+Report title: Simple HTML Site
+
+Click Build Now, then open the report to view the webpage.
+
+
+6
+
+
+Start Minikube
+
+minikube start --driver=docker
+kubectl get nodes
+
+
+nginx-pod.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+
+
+Apply & Test
+
+kubectl apply -f nginx-pod.yaml
+kubectl get pods
+kubectl describe pod nginx-pod
+kubectl port-forward pod/nginx-pod 8080:80
